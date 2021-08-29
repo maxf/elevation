@@ -10,18 +10,32 @@ const getElevation = async function(lat, lon): Promise<string> {
   return 'awesome';
 }
 
+const p2g = function(p: {x: number, y: number}): {lat: number, lon: number} {
+  return { lat: p.x, lon: p.x };
+}
+
+
 
 
 const sketch = function(p5: p5) {
 
+  const width: number = 700;
+  const height: number = 700;
+
   p5.setup = function() {
-    p5.createCanvas(700, 410);
+    p5.createCanvas(width, height);
   }
 
   p5.draw = function() {
     p5.background(0);
     p5.fill('blue');
-    p5.rect(100, 100, 50, 50);
+
+
+    for (let x: number = 0; x < width; x += 50) {
+      for (let y: number = 0; y < height; y += 50) {
+        p5.rect(x, y, 30, 30);
+      }
+    }
   }
 };
 
