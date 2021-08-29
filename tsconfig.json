@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "sourceMap": true,
+    "removeComments": true,
+    "noImplicitAny": false
+  },
+  "files": [
+    "elevation.ts"
+  ]
+}
