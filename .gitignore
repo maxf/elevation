@@ -2,3 +2,5 @@ data
 node_modules
 .cache
 dist
+elevation.js
+elevation.js.map

@@ -8,4 +8,5 @@ windows:
         - e .
         - yarn run parcel index.html
         - docker run -t -i -v $(pwd)/data:/code/data -p 8081:8080 openelevation/open-elevation
+        - yarn run jsc -w
         -
