@@ -4,3 +4,4 @@ node_modules
 dist
 elevation.js
 elevation.js.map
+venv
