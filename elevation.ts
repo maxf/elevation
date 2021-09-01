@@ -1,10 +1,9 @@
-import { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshBasicMaterial, Mesh } from 'three';
+import { Scene, PerspectiveCamera, WebGLRenderer, BufferAttribute, BufferGeometry, MeshBasicMaterial, Mesh } from 'three';
 
 type Location = {
   latitude: number,
   longitude: number
 };
-
 
 const elevationAPiUrl = 'http://localhost:1234/elevations.json';
 
@@ -12,18 +11,21 @@ const getElevations = function(): Promise<any> {
   return new Promise((resolve, reject) =>
     fetch(elevationAPiUrl)
       .then(response => response.json())
-      .then(jsonResponse => resolve(jsonResponse.results))
+      .then(resolve)
       .catch(error => reject(error)));
 };
 
-/*
-const ll2xyz = function({lat: number, lon: number}):{x: number, y: number} {
-  return {
-    lat: ( y / height) * (south - north) + north,
-    lon: ( x / width ) * (east - west) + west
-  }
+
+const location2vertex = function(l: Location):Array<number> {
+  const r = 1;
+  const latRadians = l.latitude * Math.PI / 180;
+  const lonRadians = l.longitude * Math.PI / 180;
+  return [
+    r * Math.cos(latRadians) * Math.cos(lonRadians),
+    r * Math.cos(latRadians) * Math.sin(lonRadians),
+    r * Math.sin(latRadians)
+  ];
 };
-*/
 
 
 const scene = new Scene();
@@ -32,22 +34,46 @@ const renderer = new WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
-const geometry = new BoxGeometry();
-const material = new MeshBasicMaterial( { color: 0x00ff00 } );
-const cube = new Mesh( geometry, material );
-scene.add( cube );
+
+const computeIndices = function(n: number, m: number):Array<number> {
+  let result = [];
+  for (let row = 0; row < m-1; row++) {
+    for (let col = 0; col < n-1; col++) {
+      result = result.concat([
+        row * n + col,
+        row * n + col + 1,
+        (row + 1) * n + col,
+
+        row * n + col + 1,
+        (row + 1) * n + col + 1,
+        (row + 1) * n + col
+      ]);
+    }
+  }
+  return result;
+};
+
 
 camera.position.z = 5;
+let mesh;
 
 getElevations()
   .then(locationsWithElevations => {
-    // create a mesh
+    const geometry = new BufferGeometry();
+    const xyzs = locationsWithElevations.results.map(location2vertex);
+    const vertices = new Float32Array(xyzs.flat());
+    console.log(xyzs)
+    geometry.setIndex(computeIndices(locationsWithElevations.nLon, locationsWithElevations.nLat));
+    geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+    const material = new MeshBasicMaterial( { color: 0x00ff00 } );
+    mesh = new Mesh( geometry, material );
+    scene.add( mesh );
+    animate();
   });
 
 function animate() {
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
+  mesh.rotation.x += 0.01;
+  mesh.rotation.y += 0.01;
   requestAnimationFrame( animate );
   renderer.render( scene, camera );
 }
-animate();

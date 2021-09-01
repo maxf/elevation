@@ -7,8 +7,8 @@ west = -14.931820
 north = 62.310835
 south = 48.519515
 
-samples_lat = 40
-samples_lon = 40
+samples_lat = 5
+samples_lon = 5
 
 elevation_api_limit = 500
 nb_groups = 1 + samples_lat * samples_lon // elevation_api_limit
@@ -42,7 +42,6 @@ for response in responses:
     if response.status_code != 200:
         raise Exception
     response_object = json.loads(response.text)
-#    for r in response_object["results"]:
-#        if r["elevation"] > 0:
-#            print(r["elevation"])
-    print([r["elevation"] for r in response_object["results"] if r["elevation"] > 0])
+    response_object["nLat"] = samples_lat;
+    response_object["nLon"] = samples_lon;
+    print(json.dumps(response_object))
