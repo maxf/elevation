@@ -2,15 +2,21 @@ import grequests
 import json
 import numpy as np
 
-east =   2.570290
-west = -14.931820
-north = 62.310835
-south = 48.519515
+# east =   2.570290
+# west = -14.931820
+# north = 62.310835
+# south = 48.519515
+
+
+east = 60;
+west = -60;
+north = 60;
+south = -60
 
 samples_lat = 5
 samples_lon = 5
 
-elevation_api_limit = 500
+elevation_api_limit = 400
 nb_groups = 1 + samples_lat * samples_lon // elevation_api_limit
 
 
@@ -38,10 +44,15 @@ for group in sample_groups:
 
 responses = grequests.map(set(post_requests))
 
+response_points = []
 for response in responses:
     if response.status_code != 200:
         raise Exception
     response_object = json.loads(response.text)
-    response_object["nLat"] = samples_lat;
-    response_object["nLon"] = samples_lon;
-    print(json.dumps(response_object))
+    response_points += response_object["results"]
+
+print(json.dumps({
+    "response": response_points,
+    "nLat": samples_lat,
+    "nLon": samples_lon
+}))

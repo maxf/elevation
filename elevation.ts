@@ -66,6 +66,7 @@ getElevations()
     geometry.setIndex(computeIndices(locationsWithElevations.nLon, locationsWithElevations.nLat));
     geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
     const material = new MeshBasicMaterial( { color: 0x00ff00 } );
+    material.wireframe = true;
     mesh = new Mesh( geometry, material );
     scene.add( mesh );
     animate();
