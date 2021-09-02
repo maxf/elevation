@@ -17,7 +17,7 @@ const getElevations = function(): Promise<any> {
 
 
 const location2vertex = function(l: Location):Array<number> {
-  const r = 1;
+  const r = 1 + l.elevation/8000;
   const latRadians = l.latitude * Math.PI / 180;
   const lonRadians = l.longitude * Math.PI / 180;
   return [
@@ -60,21 +60,21 @@ let mesh;
 getElevations()
   .then(locationsWithElevations => {
     const geometry = new BufferGeometry();
-    const xyzs = locationsWithElevations.results.map(location2vertex);
+    const xyzs = locationsWithElevations.response.map(location2vertex);
     const vertices = new Float32Array(xyzs.flat());
-    console.log(xyzs)
     geometry.setIndex(computeIndices(locationsWithElevations.nLon, locationsWithElevations.nLat));
     geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
     const material = new MeshBasicMaterial( { color: 0x00ff00 } );
     material.wireframe = true;
     mesh = new Mesh( geometry, material );
+    mesh.rotation.x = -Math.PI/2;
     scene.add( mesh );
     animate();
   });
 
 function animate() {
-  mesh.rotation.x += 0.01;
-  mesh.rotation.y += 0.01;
+  mesh.rotation.z += 0.01;
+
   requestAnimationFrame( animate );
   renderer.render( scene, camera );
 }
