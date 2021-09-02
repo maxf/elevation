@@ -8,10 +8,10 @@ import numpy as np
 # south = 48.519515
 
 
-east = 60;
-west = -60;
-north = 60;
-south = -60
+east = 180;
+west = -180;
+north = 90;
+south = -90
 
 samples_lat = 50
 samples_lon = 50
@@ -20,8 +20,8 @@ elevation_api_limit = 400
 nb_groups = 1 + samples_lat * samples_lon // elevation_api_limit
 
 
-lats = np.linspace(west, east, samples_lat)
-lons = np.linspace(north, south, samples_lon)
+lons = np.linspace(west, east, samples_lat)
+lats = np.linspace(north, south, samples_lon)
 
 samples = np.array([])
 
