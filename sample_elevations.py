@@ -2,13 +2,18 @@ import requests
 import json
 import numpy as np
 import sys
+import argparse
 
 
-if len(sys.argv) == 1:
-    print("Usage: %s <output_filename>".format(sys.argv[0]))
-    sys.exit(-1)
+parser = argparse.ArgumentParser(description='Create a grid of lat/lon/elevations')
+parser.add_argument('samples_lat', metavar='<Samples-Lat>', type=int, help='Number of samples along latitude')
+parser.add_argument('samples_lon', metavar='<Samples-Lon>', type=int, help='Number of samples along longitude')
+parser.add_argument('output_file', metavar='<Output-filename>', type=argparse.FileType('w'), help='Output filename')
+args = parser.parse_args()
 
-output_filename = sys.argv[1]
+output_file = args.output_file
+samples_lat = args.samples_lat
+samples_lon = args.samples_lon
 
 
 # east =   2.570290
@@ -21,9 +26,6 @@ east = 180;
 west = -180;
 north = 90;
 south = -90
-
-samples_lat = 100
-samples_lon = 100
 
 elevation_api_limit = 400
 nb_groups = 1 + samples_lat * samples_lon // elevation_api_limit
@@ -58,11 +60,12 @@ for i, group in enumerate(sample_groups):
         response_object = json.loads(response.text)
         response_points += response_object["results"]
 
-print("Writing output to " + sys.argv[1])
-output_file = open(output_filename, "w")
+print("Writing output to " + output_file.name)
+#output_file = open(output_filename, "w")
 output_file.write(json.dumps({
     "response": response_points,
     "nLat": samples_lat,
     "nLon": samples_lon
 }))
+output_file.close()
 print("done.")
