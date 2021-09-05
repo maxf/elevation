@@ -16,16 +16,16 @@ samples_lat = args.samples_lat
 samples_lon = args.samples_lon
 
 
-# east =   2.570290
-# west = -14.931820
-# north = 62.310835
-# south = 48.519515
+east =   2.5
+west = -11
+north = 59.5
+south = 49.5
 
-
-east = 180;
-west = -180;
-north = 90;
-south = -90
+# whole earth
+#east = 180;
+#west = -180;
+#north = 90;
+#south = -90
 
 elevation_api_limit = 400
 nb_groups = 1 + samples_lat * samples_lon // elevation_api_limit
