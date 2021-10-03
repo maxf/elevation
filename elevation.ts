@@ -23,11 +23,12 @@ const location2vertex = function(l: Location): Array<number> {
   const r: number = 2 + l.elevation / 7000;
   const latRadians: number = l.latitude * Math.PI / 180;
   const lonRadians: number = l.longitude * Math.PI / 180;
-  return [
+  const vertex = [
     r * Math.cos(latRadians) * Math.cos(lonRadians),
     r * Math.cos(latRadians) * Math.sin(lonRadians),
     r * Math.sin(latRadians)
   ];
+  return vertex;
 };
 
 
@@ -91,8 +92,16 @@ let mesh: Mesh;
 getElevations()
   .then(locationsWithElevations => {
     const geometry = new BufferGeometry();
-    const xyzs = locationsWithElevations.response.map(location2vertex);
+
+    const xyzs = [];
+    for (let row of locationsWithElevations.response) {
+      for (let cell of row) {
+        xyzs.push(location2vertex(cell))
+      }
+    }
+
     const vertices = new Float32Array(xyzs.flat());
+
     geometry.setIndex(computeIndices(locationsWithElevations.nLon, locationsWithElevations.nLat));
     geometry.setAttribute('position', new BufferAttribute(vertices, 3));
     geometry.computeVertexNormals();
@@ -109,10 +118,10 @@ getElevations()
     animate();
   });
 
-let t=0;
+let t = 0;
 function animate() {
-  t+=0.01;
-  light1.position.x = 20*Math.sin(t);
+  t += 0.01;
+  light1.position.x = 20 * Math.sin(t);
   requestAnimationFrame(animate);
   controls.update();
   renderer.render(scene, camera);

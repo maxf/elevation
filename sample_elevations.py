@@ -80,13 +80,15 @@ for i, group in enumerate(sample_groups):
 
 # TODO: split response_points into a samples_lat x samples_lon matrix
 
-# then: smooth out elevations
+np_lat_lon_matrix = np.array_split(np.array(response_points), samples_lat)
 
+# then: smooth out elevations
+lat_lon_matrix = [list(row) for row in list(np_lat_lon_matrix)]
 
 print("Writing output to " + output_file.name)
 
 output_file.write(json.dumps({
-    "response": response_points,
+    "response": lat_lon_matrix,
     "nLat": samples_lat,
     "nLon": samples_lon
 }))
