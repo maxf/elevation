@@ -7,4 +7,5 @@ windows:
       panes:
         - e .
         - yarn run parcel index.html
+        - yarn run tsc -w
         -
