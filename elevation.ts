@@ -44,13 +44,13 @@ scene.add(light2);
 const renderer = new WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 //renderer.shadowMap.type = PCFSoftShadowMap;
-renderer.shadowMapEnabled = true;
+renderer.shadowMap.enabled = true;
 document.body.appendChild(renderer.domElement);
 const controls = new TrackballControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
-controls.rotateSpeed = 1.0;
-controls.zoomSpeed = 1.2;
-controls.panSpeed = 0.8;
+controls.rotateSpeed = .1;
+controls.zoomSpeed = 0.5;
+controls.panSpeed = 0.1;
 controls.keys = ['KeyA', 'KeyS', 'KeyD'];
 
 

@@ -3,3 +3,7 @@ node_modules
 .cache
 dist
 venv
+elevation.js
+elevation.js.map
+static
+

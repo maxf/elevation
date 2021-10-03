@@ -15,7 +15,7 @@ output_file = args.output_file
 samples_lat = args.samples_lat
 samples_lon = args.samples_lon
 
-
+# British isles
 east =   2.5
 west = -11
 north = 59.5
@@ -60,8 +60,13 @@ for i, group in enumerate(sample_groups):
         response_object = json.loads(response.text)
         response_points += response_object["results"]
 
+## TODO: split response_points into a samples_lat x samples_lon matrix
+
+## then: smooth out elevations
+
+
 print("Writing output to " + output_file.name)
-#output_file = open(output_filename, "w")
+
 output_file.write(json.dumps({
     "response": response_points,
     "nLat": samples_lat,
