@@ -1,14 +1,31 @@
 import requests
 import json
 import numpy as np
-import sys
 import argparse
 
 
-parser = argparse.ArgumentParser(description='Create a grid of lat/lon/elevations')
-parser.add_argument('samples_lat', metavar='<Samples-Lat>', type=int, help='Number of samples along latitude')
-parser.add_argument('samples_lon', metavar='<Samples-Lon>', type=int, help='Number of samples along longitude')
-parser.add_argument('output_file', metavar='<Output-filename>', type=argparse.FileType('w'), help='Output filename')
+parser = argparse.ArgumentParser(
+    description='Create a grid of lat/lon/elevations'
+)
+
+parser.add_argument(
+    'samples_lat',
+    metavar='<Samples-Lat>',
+    type=int,
+    help='Number of samples along latitude')
+
+parser.add_argument(
+    'samples_lon',
+    metavar='<Samples-Lon>',
+    type=int,
+    help='Number of samples along longitude')
+
+parser.add_argument(
+    'output_file',
+    metavar='<Output-filename>',
+    type=argparse.FileType('w'),
+    help='Output filename')
+
 args = parser.parse_args()
 
 output_file = args.output_file
@@ -16,16 +33,16 @@ samples_lat = args.samples_lat
 samples_lon = args.samples_lon
 
 # British isles
-east =   2.5
+east = 2.5
 west = -11
 north = 59.5
 south = 49.5
 
 # whole earth
-#east = 180;
-#west = -180;
-#north = 90;
-#south = -90
+# east = 180;
+# west = -180;
+# north = 90;
+# south = -90
 
 elevation_api_limit = 400
 nb_groups = 1 + samples_lat * samples_lon // elevation_api_limit
@@ -42,7 +59,8 @@ for lat in lats:
 
 sample_groups = np.array_split(samples, nb_groups)
 
-print("We're going to fetch {} elevations from the server using {} http calls".format(len(samples), len(sample_groups)))
+print("We're going to fetch {} elevations from the server using {} http calls"
+      .format(len(samples), len(sample_groups)))
 
 response_points = []
 for i, group in enumerate(sample_groups):
@@ -60,9 +78,9 @@ for i, group in enumerate(sample_groups):
         response_object = json.loads(response.text)
         response_points += response_object["results"]
 
-## TODO: split response_points into a samples_lat x samples_lon matrix
+# TODO: split response_points into a samples_lat x samples_lon matrix
 
-## then: smooth out elevations
+# then: smooth out elevations
 
 
 print("Writing output to " + output_file.name)
