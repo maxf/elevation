@@ -1,12 +1,7 @@
-import { PCFSoftShadowMap, DirectionalLight, Scene, PerspectiveCamera, WebGLRenderer, BufferAttribute, BufferGeometry, MeshPhongMaterial, Mesh, AmbientLight } from 'three';
+import { DirectionalLight, Scene, PerspectiveCamera, WebGLRenderer, BufferAttribute, BufferGeometry, MeshPhongMaterial, Mesh, AmbientLight } from 'three';
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
+import { Convolution } from './Convolution';
 
-
-type Location = {
-  latitude: number,
-  longitude: number,
-  elevation: number
-};
 
 const elevationAPiUrl = 'http://localhost:1234/elevations.json';
 
@@ -19,11 +14,11 @@ const getElevations = function(): Promise<any> {
 };
 
 
-const location2vertex = function(l: Location): Array<number> {
-  const r: number = 2 + l.elevation / 7000;
-  const latRadians: number = l.latitude * Math.PI / 180;
-  const lonRadians: number = l.longitude * Math.PI / 180;
-  const vertex = [
+const location2vertex = function(l: number[]): number[] {
+  const r: number = 2 + l[2] / 30000;
+  const latRadians: number = l[0] * Math.PI / 180;
+  const lonRadians: number = l[1] * Math.PI / 180;
+  const vertex: number[] = [
     r * Math.cos(latRadians) * Math.cos(lonRadians),
     r * Math.cos(latRadians) * Math.sin(lonRadians),
     r * Math.sin(latRadians)
@@ -90,19 +85,34 @@ camera.rotation.z = -0.06488203924640336;
 let mesh: Mesh;
 
 getElevations()
-  .then(locationsWithElevations => {
+  .then((positions: number[][][]) => {
     const geometry = new BufferGeometry();
 
+    const nLon = positions.length;
+    const nLat = positions[0].length;
+
+    const elevations: number[][] = positions.map(
+      (row: number[][]) => row.map((cell: number[]) => cell[2]));
+
+    const c = new Convolution();
+    const convolutedElevations = c.gaussianConv(3, 10, elevations);
+
+    const newPositions: number[][][] = positions.map(
+      (row: number[][], i: number) => row.map(
+        (cell: number[], j: number) => [cell[0], cell[1], convolutedElevations[i][j]]));
+
+
     const xyzs = [];
-    for (let row of locationsWithElevations.response) {
-      for (let cell of row) {
-        xyzs.push(location2vertex(cell))
+    for (let row of newPositions) {
+      for (let position of row) {
+        xyzs.push(location2vertex(position))
       }
     }
 
     const vertices = new Float32Array(xyzs.flat());
 
-    geometry.setIndex(computeIndices(locationsWithElevations.nLon, locationsWithElevations.nLat));
+
+    geometry.setIndex(computeIndices(nLon, nLat));
     geometry.setAttribute('position', new BufferAttribute(vertices, 3));
     geometry.computeVertexNormals();
     const material = new MeshPhongMaterial({ color: 0x44aa88 });

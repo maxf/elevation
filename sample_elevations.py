@@ -3,7 +3,6 @@ import json
 import numpy as np
 import argparse
 
-
 parser = argparse.ArgumentParser(
     description='Create a grid of lat/lon/elevations'
 )
@@ -78,19 +77,25 @@ for i, group in enumerate(sample_groups):
         response_object = json.loads(response.text)
         response_points += response_object["results"]
 
-# TODO: split response_points into a samples_lat x samples_lon matrix
+np_position_matrix = np.reshape(
+    np.array(response_points),
+    (samples_lat, samples_lon))
 
-np_lat_lon_matrix = np.array_split(np.array(response_points), samples_lat)
 
-# then: smooth out elevations
-lat_lon_matrix = [list(row) for row in list(np_lat_lon_matrix)]
+extract_elevation = np.vectorize(lambda p: p["elevation"])
+extract_lat = np.vectorize(lambda p: p["latitude"])
+extract_lon = np.vectorize(lambda p: p["longitude"])
+
+
+elevations = extract_elevation(np_position_matrix)
+lats = extract_lat(np_position_matrix)
+lons = extract_lon(np_position_matrix)
+
+
+# convert to python list to output as json
+positions = np.stack((lats, lons, elevations), axis=-1)
 
 print("Writing output to " + output_file.name)
-
-output_file.write(json.dumps({
-    "response": lat_lon_matrix,
-    "nLat": samples_lat,
-    "nLon": samples_lon
-}))
+output_file.write(json.dumps(positions.tolist()))
 output_file.close()
 print("done.")
